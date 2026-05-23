@@ -1,0 +1,45 @@
+{
+  "purchaseCases": [
+    {
+      "case": "new user completes checkout and downloads invoice",
+      "user": {
+        "title": "Mr",
+        "firstName": "John",
+        "lastName": "Doe",
+        "password": "P@ssw0rd123!",
+        "company": "Acme Inc",
+        "address1": "221B Baker Street",
+        "address2": "Apartment 7",
+        "country": "India",
+        "state": "Maharashtra",
+        "city": "Mumbai",
+        "zipCode": "400001",
+        "mobileNumber": "9999999999"
+      },
+      "product": {
+        "name": "Blue Top",
+        "quantity": 1
+      },
+      "payment": {
+        "nameOnCard": "John Doe",
+        "cardNumber": "4111111111111111",
+        "cvc": "123",
+        "expiryMonth": "12",
+        "expiryYear": "2030"
+      }
+    }
+  ],
+  "negativeCases": [
+    {
+      "case": "signup with invalid email format",
+      "name": "Invalid Email User",
+      "email": "invalid-email"
+    }
+  ],
+  "boundaryCases": [
+    {
+      "case": "purchase with minimum allowed quantity",
+      "quantity": 1
+    }
+  ]
+}
