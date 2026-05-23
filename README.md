@@ -332,3 +332,7 @@ If you want, this README can be extended further with:
 - a CI YAML example,
 - contribution standards,
 - and a test case authoring template.
+
+## Additional Documentation
+
+- Agent and skill usage guide: `README-AGENTS-WITH-SKILLS.md`
