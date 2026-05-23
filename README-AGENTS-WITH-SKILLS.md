@@ -2,6 +2,17 @@
 
 This document explains how the agent setup in this repository works, how skills are used, and how to make an agent generate high-quality test cases.
 
+## Latest Commit Update
+
+This guide is updated for the latest commit (`a3eeb0c`) which introduced:
+
+- `.claude/agents/general-testing-activities.md`
+
+Impact:
+
+- `general testing activities` is now a first-class QA authoring option for creating test cases, automation scenarios, API-focused cases, and bug reports from mixed inputs.
+- Existing specialized agents are still useful for strict separation of duties.
+
 ## 1. What "Agents With Skills" Means
 
 In this project, an **agent** is a specialized worker with a narrow responsibility, and a **skill** is a reusable instruction playbook that the agent follows.
@@ -30,6 +41,7 @@ Agents are defined in:
 
 - `.claude/agents/automation-testing-engineer.md`
 - `.claude/agents/automation-tool-installer.md`
+- `.claude/agents/general-testing-activities.md`
 - `.claude/agents/test-case-runner.md`
 - `.claude/agents/testing-activities-creator.md`
 
@@ -59,6 +71,30 @@ Each skill defines:
 - file save location
 
 ## 4. Roles Of Each Agent (Who Does What)
+
+## 4.0 general testing activities
+
+Primary role:
+
+- Broad QA authoring and analysis agent for manual/API/automation-oriented test assets
+
+Expected outputs:
+
+- manual test cases
+- automation test scenarios
+- API-focused test cases
+- bug reports (when failures/logs/errors are provided)
+- assumptions and input analysis sections
+
+Strengths:
+
+- Handles mixed input types in one request (requirements + API docs + logs)
+- Enforces structured response sections and QA coverage depth
+- Includes built-in cap behavior for very large test suites (first 20 cases + remaining coverage)
+
+Must NOT do:
+
+- non-QA topics outside testing and automation engineering
 
 ## 4.1 automation-testing-engineer
 
@@ -153,20 +189,23 @@ Must NOT do:
 |---|---|---|
 | `author-automation-scripts` | `automation-testing-engineer` | Generate Playwright POM + data-driven automation code |
 | `install-playwright-allure` | `automation-tool-installer` | Install/configure Playwright + Allure stack |
+| `create-test-cases` | `general testing activities` | Generate comprehensive QA test assets from stories, APIs, and workflows |
+| `create-bug-report` | `general testing activities` | Generate structured bug reports from errors/logs/failures |
 | `create-test-cases` | `testing-activities-creator` | Create structured QA test cases from requirements |
 | `create-bug-report` | `testing-activities-creator` | Create reproducible, tracker-ready defect reports |
 | `run-test-cases` | `test-case-runner` | Execute authored cases and publish run report |
 
 ## 6. How To Make An Agent Write Test Cases
 
-If your goal is manual/structured QA test cases (not Playwright code), use the **testing-activities-creator** path.
+If your goal is manual/structured QA test cases (not Playwright code), use the **general testing activities** path first.
+If you want a narrower, classic authoring-only role, use **testing-activities-creator**.
 
 ## 6.1 Best prompt template
 
 Use a prompt like this:
 
 ```text
-Use testing-activities-creator.
+Use general testing activities.
 Create test cases for: <feature/user story>.
 Scope in: <what to cover>.
 Scope out: <what not to cover>.
@@ -177,6 +216,12 @@ Acceptance criteria:
 3) ...
 Please include positive, negative, boundary, auth/permission, and error-message coverage.
 Save as test-cases/<feature-slug>.md.
+```
+
+For API-heavy inputs, add:
+
+```text
+Also include API-focused cases for status codes, schema, auth/authz, invalid payloads, boundaries, and rate limiting.
 ```
 
 ## 6.2 What you should provide for best results
@@ -225,17 +270,17 @@ This triggers the `author-automation-scripts` behavior.
 ## 8. End-to-End Recommended Workflow
 
 1. Use `automation-tool-installer` to set up toolchain (if project not ready).
-2. Use `testing-activities-creator` to generate manual test cases from requirements.
+2. Use `general testing activities` to generate comprehensive test assets from requirements and/or API docs.
 3. Use `automation-testing-engineer` to convert selected cases into automation.
 4. Use `test-case-runner` to execute and produce run report.
-5. Use `testing-activities-creator` to finalize bug reports for failures.
+5. Use `general testing activities` (or `testing-activities-creator`) to finalize bug reports for failures.
 
 ## 9. Practical Prompt Examples
 
 ## 9.1 Create manual test cases
 
 ```text
-Use testing-activities-creator.
+Use general testing activities.
 Create test cases for user registration.
 Include valid signup, invalid email, duplicate email, weak password, and required-field checks.
 Target browser: Chrome latest.
@@ -262,7 +307,7 @@ Create execution report with evidence and status summary.
 ## 9.4 Create bug report from a failing case
 
 ```text
-Use testing-activities-creator.
+Use general testing activities.
 Create a bug report for failed case TC-REG-004 (duplicate email should show validation, but account creation proceeds).
 Save under bug-reports/duplicate-email-validation.md.
 ```
@@ -289,10 +334,11 @@ If an agent gives partial or wrong output:
 | You need to... | Use this agent |
 |---|---|
 | Install Playwright/Allure | `automation-tool-installer` |
-| Design manual test cases | `testing-activities-creator` |
+| Design manual/API/hybrid QA test cases | `general testing activities` |
+| Design manual test cases (strict classic authoring path) | `testing-activities-creator` |
 | Write Playwright automation code | `automation-testing-engineer` |
 | Run existing test cases and collect results | `test-case-runner` |
-| Write formal bug report | `testing-activities-creator` |
+| Write formal bug report | `general testing activities` |
 
 ---
 
